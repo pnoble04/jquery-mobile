@@ -1,13 +1,17 @@
 requirejs.config({
 	"paths": {
 		// requireJS plugins
-		"text": "../external/requirejs/plugins/text",
-		"json": "../external/requirejs/plugins/json"
+		"text": "../vendor/requirejs/plugins/text",
+		"json": "../vendor/requirejs/plugins/json",
+
+		"jquery": "../vendor/jquery/jquery",
+		"jquery-ui": "../vendor/jquery-ui",
+		"jquery-plugins": "../vendor/jquery/plugins"
 	},
 	"shim": {
-		"jquery.hashchange": [ "jquery" ],
-		"jquery.ui.widget": [ "jquery" ],
-		"widgets/jquery.ui.tabs": [ "jquery.ui.widget" ],
-		"widgets/jquery.ui.core": [ "jquery" ]
+		"jquery-plugins/jquery.hashchange": [ "jquery" ],
+		"jquery-ui/jquery.ui.widget": [ "jquery" ],
+		"jquery-ui/jquery.ui.tabs": [ "jquery-ui/jquery.ui.widget" ],
+		"jquery-ui/jquery.ui.core": [ "jquery" ]
 	}
 });
