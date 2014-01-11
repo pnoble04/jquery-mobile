@@ -657,8 +657,8 @@ module.exports = function( grunt ) {
 				options: {
 					urls: (function() {
 						// Find the test files
-						var suites = _.without( ( grunt.option( "suites" ) || "" ).split( "," ), "" ),
-							types = _.without( ( grunt.option( "types" ) || "" ).split( "," ), "" ).sort().reverse(), // So that unit runs before integration
+						var suites = _.without( ( grunt.option( "suites" ) || process.env.SUITES || "" ).split( "," ), "" ),
+							types = _.without( ( grunt.option( "types" ) || process.env.TYPES || "" ).split( "," ), "" ).sort().reverse(), // So that unit runs before integration
 							patterns, paths,
 							prefixes = ["tests/unit/", "tests/integration/"],
 							versionedPaths = [],
