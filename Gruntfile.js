@@ -657,42 +657,59 @@ module.exports = function( grunt ) {
 				options: {
 					urls: (function() {
 						// Find the test files
-						var suites = _.without( ( grunt.option( "suites" ) || process.env.SUITES || "" ).split( "," ), "" ),
+						var allSuites, patterns, paths,
+							testDirs = [ "unit", "integration" ],
+							suites = _.without( ( grunt.option( "suites" ) || process.env.SUITES || "" ).split( "," ), "" ),
 							types = _.without( ( grunt.option( "types" ) || process.env.TYPES || "" ).split( "," ), "" ).sort().reverse(), // So that unit runs before integration
-							patterns, paths,
-							prefixes = ["tests/unit/", "tests/integration/"],
 							versionedPaths = [],
-							jQueries = _.without( ( grunt.option( "jqueries" ) || process.env.JQUERIES || "" ).split( "," ), "" );
+							jQueries = _.without( ( grunt.option( "jqueries" ) || process.env.JQUERIES || "" ).split( "," ), "" ),
+							excludes = _.chain( suites )
+								.filter( function( suite ) { return ( /^!/.test( suite ) ); } )
+								.map( function( suite ) { return suite.substring( 1 ); } )
+								.value();
+
+						allSuites = _.chain( grunt.file.expand(
+								{
+									filter: "isDirectory",
+									cwd: "tests"
+								},
+								_.map( testDirs, function( dir ) {
+									return dir + "/*";
+								})
+							))
+							.map( function( dir ) { return dir.split( "/" )[1]; } )
+							.difference( excludes )
+							.unique()
+							.value();
+
+
+						// Remove negations from list of suites
+						suites = _.filter( suites, function( suite ) { return ( !/^!/.test( suite ) ); } );
 
 						if( types.length ){
-							prefixes = [];
+							testDirs = [];
 							types.forEach(function( type ) {
-								prefixes.push( "tests/" + type +"/" );
+								testDirs.push( "tests/" + type );
 							});
 						}
 
 						patterns = [];
 
-						if ( suites.length ) {
-							suites.forEach( function( unit ) {
-								prefixes.forEach( function( prefix ) {
+						if ( !suites.length ) {
+							suites = allSuites;
+						}
+
+						_.chain( suites )
+							.difference( excludes )
+							.forEach( function( suite ) {
+								testDirs.forEach( function( dir ) {
 									patterns = patterns.concat([
-										prefix + unit + "/",
-										prefix + unit + "/index.html",
-										prefix + unit + "/*/index.html",
-										prefix + unit + "/**/*-tests.html"
+										dir + "/" + suite + "/index.html",
+										dir + "/" + suite + "/*/index.html",
+										dir + "/" + suite + "/**/*-tests.html"
 									]);
 								});
 							});
-						} else {
-							prefixes.forEach( function( prefix ) {
-								patterns = patterns.concat([
-									prefix + "*/index.html",
-									prefix + "*/*/index.html",
-									prefix + "**/*-tests.html"
-								]);
-							});
-						}
 
 						paths = grunt.file.expand( patterns )
 							.filter( function( testPath ) {
