@@ -7,6 +7,7 @@ script: npm run-script ci
 branches:
   only:
     - master
+    - issue-6917
 env:
   - TYPES=unit
     JQUERIES=1.8.3
